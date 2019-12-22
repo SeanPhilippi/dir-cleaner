@@ -1,16 +1,14 @@
 from path import Path
 import os
 
-PATH = os.getenv['DIR_PATH']
+PATH = os.environ["FILE_CLEANER_DIR_PATH"]
 
 dir = Path(PATH)
-dir.walkfiles('*')
-list(dir.walkfiles())
 
-# files = dir.walkfiles('*.jpg')
-# files = dir.walkfiles('*.png')
-# files = dir.walkfiles('*.pdf')
-files = dir.walkfiles('*.db')
-for file in files:
-  file.remove()
-  print(files)
+patterns = ['*.db', '*.pdf', '*.png', '*jpg', '*jpeg']
+
+for i in patterns:
+  files = dir.walkfiles(i)
+  for file in files:
+    file.remove()
+    print(file)
