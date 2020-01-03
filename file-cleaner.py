@@ -17,7 +17,7 @@ def file_cleaner(dir, patterns):
 print('What is your file path?')
 print('type "*" for default, or enter a file path')
 answer = input()
-print('answer', answer)
+
 if answer == '*':
   dir = default_dir
 else:
@@ -25,12 +25,10 @@ else:
 print('What file types do you want to delete?')
 print('type "*" for default, or enter comma separated extentions to delete')
 answer2 = input()
-print('answer2', answer2)
 
 patterns = []
 if answer2 == '*':
   patterns = default_patterns
-  print('default patterns', patterns)
 else:
   extension_list = answer2.split(',')
 
