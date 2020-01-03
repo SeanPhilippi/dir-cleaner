@@ -19,7 +19,6 @@ default_patterns = [
 
 def file_cleaner(dir, patterns):
   for i in patterns:
-    # print('here2')
     files = dir.walkfiles(i)
     for file in files:
       file.remove()
