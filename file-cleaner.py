@@ -5,7 +5,7 @@ PATH = os.environ["FILE_CLEANER_DIR_PATH"]
 
 default_dir = Path(PATH)
 
-default_patterns = ['*.db', '*.pdf', '*.png', '*.jpg', '*.jpeg']
+default_patterns = ['*.db', '*.pdf', '*.png', '*.jpg', '*.jpeg', '*.m3u', '*.nfo', '*.txt']
 
 def file_cleaner(dir, patterns):
   for i in patterns:
