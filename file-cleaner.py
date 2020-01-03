@@ -9,26 +9,28 @@ default_patterns = ['*.db', '*.pdf', '*.png', '*.jpg', '*.jpeg', '*.m3u', '*.nfo
 
 def file_cleaner(dir, patterns):
   for i in patterns:
+    # print('here2')
     files = dir.walkfiles(i)
-  for file in files:
-    file.remove()
-    print(file)
+    for file in files:
+      file.remove()
 
 print('What is your file path?')
-print('"default" for default, or enter a file path')
+print('type "*" for default, or enter a file path')
 answer = input()
-if answer == 'default':
+print('answer', answer)
+if answer == '*':
   dir = default_dir
 else:
   dir = Path(answer)
 print('What file types do you want to delete?')
-print('"default" for default, or enter comma separated extentions to delete')
+print('type "*" for default, or enter comma separated extentions to delete')
 answer2 = input()
+print('answer2', answer2)
 
 patterns = []
-
-if answer2 == 'default':
+if answer2 == '*':
   patterns = default_patterns
+  print('default patterns', patterns)
 else:
   extension_list = answer2.split(',')
 
