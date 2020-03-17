@@ -21,6 +21,7 @@ def file_cleaner(dir, patterns):
   for i in patterns:
     files = dir.walkfiles(i)
     for file in files:
+      print(file + ' removed')
       file.remove()
 
 print('What is your file path?')
@@ -32,7 +33,7 @@ if answer == '*':
 else:
   dir = Path(answer)
 print('What file types do you want to delete?')
-print('type "*" for default, or enter comma separated extentions to delete')
+print('type "*" for default, or enter comma separated extensions to delete')
 answer2 = input()
 
 patterns = []
