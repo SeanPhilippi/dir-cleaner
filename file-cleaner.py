@@ -1,7 +1,8 @@
 from path import Path
 import os
+import sys
 
-PATH = os.environ["FILE_CLEANER_DIR_PATH"]
+PATH = os.environ['FILE_CLEANER_DIR_PATH']
 
 default_dir = Path(PATH)
 
@@ -26,21 +27,29 @@ def file_cleaner(dir, patterns):
 
 print('What is your file path?')
 print('type "*" for default, or enter a file path')
-answer = input()
+file_path = input()
 
-if answer == '*':
+if file_path == '*':
   dir = default_dir
 else:
-  dir = Path(answer)
+  dir = Path(file_path)
+
+print(f'Your file path is {dir}. Is this correct?')
+print('type "y" for "yes" or "n" for "no"')
+answer = input()
+
+if answer != 'y':
+  sys.exit()
+
 print('What file types do you want to delete?')
 print('type "*" for default, or enter comma separated extensions to delete')
-answer2 = input()
+file_types = input()
 
 patterns = []
-if answer2 == '*':
+if file_types == '*':
   patterns = default_patterns
 else:
-  extension_list = answer2.split(',')
+  extension_list = file_types.split(',')
 
   for item in extension_list:
     item.strip(' .')
