@@ -1,4 +1,5 @@
 from path import Path
+from tqdm import tqdm
 import os
 import sys
 
@@ -21,12 +22,12 @@ default_patterns = [
 def file_cleaner(dir, patterns):
   for i in patterns:
     files = dir.walkfiles(i)
-    for file in files:
+    for file in tqdm(files):
       print(file + ' removed')
       file.remove()
 
 print('What is your file path?')
-print('type "*" for default, or enter a file path')
+print('type * for default, or enter a file path')
 file_path = input()
 
 if file_path == '*':
@@ -42,7 +43,7 @@ if answer != 'y':
   sys.exit()
 
 print('What file types do you want to delete?')
-print('type "*" for default, or enter comma separated extensions to delete')
+print('type * for default, or enter comma separated extensions to delete')
 file_types = input()
 
 patterns = []
