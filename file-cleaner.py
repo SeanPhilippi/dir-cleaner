@@ -54,7 +54,8 @@ def file_cleaner(dir, patterns):
 patterns = []
 for item in extensions:
     print("item", item)
-    item = item.strip(" .,")
+    item = item.strip(" *.,")
+    print('stripped item', item)
     item = "*." + item
     patterns.append(item)
 
