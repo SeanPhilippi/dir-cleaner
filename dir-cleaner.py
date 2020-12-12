@@ -29,6 +29,7 @@ parser.add_argument(
     help=f"Path to directory for cleaning. Default is {default_dir}.",
     default=default_dir,
 )
+
 parser.add_argument(
     "-e",
     "--extensions",
@@ -38,22 +39,31 @@ parser.add_argument(
     default=default_patterns,
 )
 
+parser.add_argument(
+    "-x",
+	"--empty",
+    help="Give value 't' to delete empty folders, 'f' to leave them alone. Defaults to 't'.",
+    default='t',
+)
+
 args = parser.parse_args()
 dir_path = args.path
 extensions = args.extensions
+empty = args.empty
 
 
-def dir_cleaner(dir, patterns):
+def dir_cleaner(dir, patterns, empty):
 	# walk folders and delete any that are empty
-	folders = list(os.walk(dir))[1:]
-	for folder in folders:
-		if not folder[1] and not folder[2]:
-			# index = folder[0].rfind('/')
-			# folder_name = folder[0][index + 1:]
-			# print(folder_name, 'removed')
-			print(folder[0], 'removed')
-			os.rmdir(folder[0])
-	# walk files and remove files with an extension in petterns list
+	if empty == 't':
+		folders = list(os.walk(dir))[1:]
+		for folder in folders:
+			if not folder[1] and not folder[2]:
+				# index = folder[0].rfind('/')
+				# folder_name = folder[0][index + 1:]
+				# print(folder_name, 'removed')
+				print(folder[0], 'removed')
+				os.rmdir(folder[0])
+	# walk files and remove files with an extension in patterns list
 	for i in patterns:
 		files = dir.walkfiles(i)
 		for file in tqdm(files):
@@ -63,13 +73,13 @@ def dir_cleaner(dir, patterns):
 
 patterns = []
 for item in extensions:
-    print("item", item)
     item = item.strip(" *.,")
-    print('stripped item', item)
     item = "*." + item
     patterns.append(item)
 
+print("==options==")
 print("path:", dir_path)
 print("patterns:", patterns)
+print("empty folders:", empty)
 
-dir_cleaner(dir_path, patterns)
+dir_cleaner(dir_path, patterns, empty)
