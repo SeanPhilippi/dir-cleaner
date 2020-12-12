@@ -21,7 +21,7 @@ default_patterns = [
 ]
 
 
-parser = argparse.ArgumentParser(description="Clean directory of certain file types.")
+parser = argparse.ArgumentParser(description="Clean directory of certain file types and empty folders.")
 
 parser.add_argument(
     "-p",
@@ -43,7 +43,7 @@ dir_path = args.path
 extensions = args.extensions
 
 
-def file_cleaner(dir, patterns):
+def dir_cleaner(dir, patterns):
 	# walk folders and delete any that are empty
 	folders = list(os.walk(dir))[1:]
 	for folder in folders:
@@ -72,4 +72,4 @@ for item in extensions:
 print("path:", dir_path)
 print("patterns:", patterns)
 
-file_cleaner(dir_path, patterns)
+dir_cleaner(dir_path, patterns)
