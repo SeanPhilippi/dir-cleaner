@@ -44,11 +44,21 @@ extensions = args.extensions
 
 
 def file_cleaner(dir, patterns):
-    for i in patterns:
-        files = dir.walkfiles(i)
-        for file in tqdm(files):
-            print(file + " removed")
-            file.remove()
+	# walk folders and delete any that are empty
+	folders = list(os.walk(dir))[1:]
+	for folder in folders:
+		if not folder[1] and not folder[2]:
+			# index = folder[0].rfind('/')
+			# folder_name = folder[0][index + 1:]
+			# print(folder_name, 'removed')
+			print(folder[0], 'removed')
+			os.rmdir(folder[0])
+	# walk files and remove files with an extension in petterns list
+	for i in patterns:
+		files = dir.walkfiles(i)
+		for file in tqdm(files):
+			print(file, " removed")
+			file.remove()
 
 
 patterns = []
