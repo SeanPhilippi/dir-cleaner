@@ -4,6 +4,10 @@ import os
 import sys
 import argparse
 
+# TODO
+# detect if 1 folder is in another folder, if so, mv inner folder out,
+# and delete parent folder
+
 PATH = os.environ["FILE_CLEANER_DIR_PATH"]
 
 default_dir = Path(PATH)
@@ -18,6 +22,8 @@ default_patterns = [
     "*.nfo",
     "*.txt",
     "*.sfv",
+    "*.htm",
+    "*.ini",
 ]
 
 
