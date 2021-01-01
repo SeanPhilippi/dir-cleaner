@@ -5,7 +5,9 @@ import sys
 import argparse
 
 # TODO
-# detect if 1 folder is in another folder, if so, mv inner folder out,
+# 1. add new bash alisas that clean different folders, Downloads vs Music for instance
+# 2. have this script delete files of a certain types, THEN
+# detect if 1 folder or file is in another folder, if so, mv inner folder or file out,
 # and delete parent folder
 
 PATH = os.environ["FILE_CLEANER_DIR_PATH"]
