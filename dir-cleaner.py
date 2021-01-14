@@ -6,13 +6,15 @@ import argparse
 
 # TODO
 # 1. add new bash alisas that clean different folders, Downloads vs Music for instance
-# 2. have this script delete files of a certain types, THEN
+# 2. have this script delete files of certain types, THEN
 # detect if 1 folder or file is in another folder, if so, mv inner folder or file out,
 # and delete parent folder
 
-PATH = os.environ["FILE_CLEANER_DIR_PATH"]
+MUSIC_PATH = os.environ["MUSIC_PATH"]
+DOWNLOADS_PATH = os.environ["DOWNLOADS_PATH"]
 
-default_dir = Path(PATH)
+default_dir = Path(MUSIC_PATH)
+dwlds_dir = Path(DOWNLOADS_PATH)
 
 default_patterns = [
     "*.db",
@@ -28,6 +30,18 @@ default_patterns = [
     "*.ini",
 ]
 
+downloads_patterns = [
+    "*.db",
+    "*.png",
+    "*.jpg",
+    "*.jpeg",
+    "*.m3u",
+    "*.nfo",
+    "*.txt",
+    "*.sfv",
+    "*.htm",
+    "*.ini",
+]
 
 parser = argparse.ArgumentParser(description="Clean directory of certain file types and empty folders.")
 
@@ -61,6 +75,12 @@ empty = args.empty
 
 
 def dir_cleaner(dir, patterns, empty):
+	# walk files and remove files with an extension in patterns list
+	for i in patterns:
+		files = dir.walkfiles(i)
+		for file in tqdm(files):
+			print(file, " removed")
+			file.remove()
 	# walk folders and delete any that are empty
 	if empty == 't':
 		folders = list(os.walk(dir))[1:]
@@ -71,12 +91,6 @@ def dir_cleaner(dir, patterns, empty):
 				# print(folder_name, 'removed')
 				print(folder[0], 'removed')
 				os.rmdir(folder[0])
-	# walk files and remove files with an extension in patterns list
-	for i in patterns:
-		files = dir.walkfiles(i)
-		for file in tqdm(files):
-			print(file, " removed")
-			file.remove()
 
 
 patterns = []
