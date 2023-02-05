@@ -27,6 +27,7 @@ default_patterns = [
     "*.txt",
     "*.sfv",
     "*.htm",
+    "*.html",
     "*.ini",
 ]
 
