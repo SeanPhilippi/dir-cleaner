@@ -8,6 +8,7 @@ import argparse
 # 1. have this script delete files of certain types, THEN
 # detect if 1 folder or file is in another folder, if so, mv inner folder or file out,
 # and delete parent folder
+# 2. tqdm still isn't progressing per folder it is processing, need to fix this
 
 default_patterns = [
     "*.db",
@@ -45,7 +46,7 @@ parser = argparse.ArgumentParser(description="Clean directory of certain file ty
 parser.add_argument(
     "-p",
     "--path",
-    help=f"Path to directory for cleaning. Default is {os.environ['MUSIC_PATH']}.",
+    help=f"Path to directory for cleaning. Default is {os.environ.get('MUSIC_PATH')}.",
     default="MUSIC_PATH",
 )
 
@@ -57,7 +58,12 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-dir_path = Path(os.environ[args.path])
+try:
+    # check that the path key given for path argument is in os.environ
+    dir_path = Path(os.environ.get(args.path))
+except:
+    print(f"{args.path} was not found in the env")
+    sys.exit()
 empty = args.empty
 
 def dir_cleaner(dir, empty):
@@ -66,11 +72,11 @@ def dir_cleaner(dir, empty):
     else:
         patterns = default_patterns
 	# walk files and remove files with an extension in patterns list
-    for ext in patterns:
+    for ext in tqdm(patterns):
         files = dir.walkfiles(ext)
-        for file in tqdm(files):
+        for file in files:
             print(file, " removed")
-            file.remove()
+            file.unlink()
 	# walk folders and delete any that are empty
     if empty == 't':
         folders = list(os.walk(dir))[1:]
@@ -80,7 +86,7 @@ def dir_cleaner(dir, empty):
                 # folder_name = folder[0][index + 1:]
                 # print(folder_name, 'removed')
                 print(folder[0], 'removed')
-                os.rmdir(folder[0])
+                Path(folder[0]).rmdir()
 
 print("==options==")
 print("path:", dir_path)
