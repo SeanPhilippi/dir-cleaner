@@ -5,16 +5,9 @@ import sys
 import argparse
 
 # TODO
-# 1. add new bash alisas that clean different folders, Downloads vs Music for instance
-# 2. have this script delete files of certain types, THEN
+# 1. have this script delete files of certain types, THEN
 # detect if 1 folder or file is in another folder, if so, mv inner folder or file out,
 # and delete parent folder
-
-MUSIC_PATH = os.environ["MUSIC_PATH"]
-DOWNLOADS_PATH = os.environ["DOWNLOADS_PATH"]
-
-default_dir = Path(MUSIC_PATH)
-dwlds_dir = Path(DOWNLOADS_PATH)
 
 default_patterns = [
     "*.db",
@@ -24,6 +17,7 @@ default_patterns = [
     "*.jpeg",
     "*.m3u",
     "*.nfo",
+    "*.NFO",
     "*.txt",
     "*.sfv",
     "*.htm",
@@ -31,16 +25,18 @@ default_patterns = [
     "*.ini",
 ]
 
-downloads_patterns = [
+transmission_dwlds_patterns = [
     "*.db",
     "*.png",
     "*.jpg",
     "*.jpeg",
     "*.m3u",
     "*.nfo",
+    "*.NFO",
     "*.txt",
     "*.sfv",
     "*.htm",
+    "*.html",
     "*.ini",
 ]
 
@@ -49,17 +45,8 @@ parser = argparse.ArgumentParser(description="Clean directory of certain file ty
 parser.add_argument(
     "-p",
     "--path",
-    help=f"Path to directory for cleaning. Default is {default_dir}.",
-    default=default_dir,
-)
-
-parser.add_argument(
-    "-e",
-    "--extensions",
-    nargs="+",
-    help="Space separated list of extentions to match for deletion. ex). python3 file-cleaner.py -e .db .pdf .txt Default is "
-    + " ".join(default_patterns),
-    default=default_patterns,
+    help=f"Path to directory for cleaning. Default is {os.environ['MUSIC_PATH']}.",
+    default="MUSIC_PATH",
 )
 
 parser.add_argument(
@@ -70,39 +57,33 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-dir_path = args.path
-extensions = args.extensions
+dir_path = Path(os.environ[args.path])
 empty = args.empty
 
-
-def dir_cleaner(dir, patterns, empty):
+def dir_cleaner(dir, empty):
+    if dir == "TRANSMISSION_DWLDS_PATH":
+        patterns = transmission_dwlds_patterns
+    else:
+        patterns = default_patterns
 	# walk files and remove files with an extension in patterns list
-	for i in patterns:
-		files = dir.walkfiles(i)
-		for file in tqdm(files):
-			print(file, " removed")
-			file.remove()
+    for ext in patterns:
+        files = dir.walkfiles(ext)
+        for file in tqdm(files):
+            print(file, " removed")
+            file.remove()
 	# walk folders and delete any that are empty
-	if empty == 't':
-		folders = list(os.walk(dir))[1:]
-		for folder in folders:
-			if not folder[1] and not folder[2]:
-				# index = folder[0].rfind('/')
-				# folder_name = folder[0][index + 1:]
-				# print(folder_name, 'removed')
-				print(folder[0], 'removed')
-				os.rmdir(folder[0])
-
-
-patterns = []
-for item in extensions:
-    item = item.strip(" *.,")
-    item = "*." + item
-    patterns.append(item)
+    if empty == 't':
+        folders = list(os.walk(dir))[1:]
+        for folder in folders:
+            if not folder[1] and not folder[2]:
+                # index = folder[0].rfind('/')
+                # folder_name = folder[0][index + 1:]
+                # print(folder_name, 'removed')
+                print(folder[0], 'removed')
+                os.rmdir(folder[0])
 
 print("==options==")
 print("path:", dir_path)
-print("patterns:", patterns)
 print("empty folders:", empty)
 
-dir_cleaner(dir_path, patterns, empty)
+dir_cleaner(dir_path, empty)

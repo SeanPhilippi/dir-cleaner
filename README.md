@@ -2,8 +2,8 @@ Program for cleaning a folder of empty folders and files with a certain extensio
 
 To run:
 
-python3 file-cleaner.py -p [dir path] -e [extensions] -x [t or f]
+python3 file-cleaner.py -p [path var] -x [t or f]
 
-separate extensions by a space. ex). python3 file-cleaner -e .txt .md .jpg
+-p options currently are MUSIC_PATH or TRANSMISSION_DWLDS_PATH wtih MUSIC_PATH being the default
 
 -x is a toggle for deleting empty folders or not. 't' to do so, 'f' to leave them alone. Defaults to 't'. 
