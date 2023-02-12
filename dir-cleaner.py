@@ -9,14 +9,6 @@ import argparse
 # detect if 1 folder or file is in another folder, if so, mv inner folder or file out,
 # and delete parent folder
 
-# MUSIC_PATH = os.environ["MUSIC_PATH"]
-# DOWNLOADS_PATH = os.environ["DOWNLOADS_PATH"]
-# TRANSMISSION_DWLDS_PATH = os.environ["TRANSMISSION_DWLDS_PATH"]
-
-# default_dir = Path(MUSIC_PATH)
-# dwlds_dir = Path(DOWNLOADS_PATH)
-# transmission_dir = Path(TRANSMISSION_DWLDS_PATH)
-
 default_patterns = [
     "*.db",
     "*.pdf",
@@ -68,7 +60,6 @@ args = parser.parse_args()
 dir_path = Path(os.environ[args.path])
 empty = args.empty
 
-
 def dir_cleaner(dir, empty):
     if dir == "TRANSMISSION_DWLDS_PATH":
         patterns = transmission_dwlds_patterns
@@ -91,9 +82,8 @@ def dir_cleaner(dir, empty):
                 print(folder[0], 'removed')
                 os.rmdir(folder[0])
 
-
 print("==options==")
-print("path:", dir_path)
+print("path:", os.environ(dir_path))
 print("empty folders:", empty)
 
 dir_cleaner(dir_path, empty)
