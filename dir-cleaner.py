@@ -83,7 +83,7 @@ def dir_cleaner(dir, empty):
                 os.rmdir(folder[0])
 
 print("==options==")
-print("path:", os.environ(dir_path))
+print("path:", dir_path)
 print("empty folders:", empty)
 
 dir_cleaner(dir_path, empty)
