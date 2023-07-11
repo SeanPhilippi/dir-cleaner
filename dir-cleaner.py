@@ -24,6 +24,9 @@ default_patterns = [
     "*.htm",
     "*.html",
     "*.ini",
+    ".DS_Store",
+    "Thumb.db",
+    "*.url",
 ]
 
 transmission_dwlds_patterns = [
@@ -39,6 +42,7 @@ transmission_dwlds_patterns = [
     "*.htm",
     "*.html",
     "*.ini",
+    "*.url",
 ]
 
 parser = argparse.ArgumentParser(description="Clean directory of certain file types and empty folders.")
