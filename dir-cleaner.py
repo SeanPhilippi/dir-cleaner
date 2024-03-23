@@ -3,6 +3,9 @@ from tqdm import tqdm
 import os
 import sys
 import argparse
+import shutil
+from send2trash import send2trash
+from datetime import datetime
 
 # TODO
 # 1. have this script delete files of certain types, THEN
@@ -71,6 +74,11 @@ except:
 empty = args.empty
 
 def dir_cleaner(dir, empty):
+    # create a directory for the cleaned files w current date
+    now = datetime.now()
+    cleaned_dir = Path(f"cleaned-{now.year}-{now.month}-{now.day}")
+    cleaned_dir.mkdir()
+
     if dir == "TRANSMISSION_DWLDS_PATH":
         patterns = transmission_dwlds_patterns
     else:
@@ -79,18 +87,23 @@ def dir_cleaner(dir, empty):
     for ext in tqdm(patterns):
         files = dir.walkfiles(ext)
         for file in files:
-            print(file, " removed")
-            file.unlink()
+            # create a new directory for this file, named after its original directory
+            new_dir = cleaned_dir / file.parent.name
+            new_dir.mkdir()
+            print(file, "moved to", new_dir)
+            shutil.move(str(file), str(new_dir))
 	# walk folders and delete any that are empty
-    if empty == 't':
+    if empty == "t":
         folders = list(os.walk(dir))[1:]
         for folder in folders:
             if not folder[1] and not folder[2]:
-                # index = folder[0].rfind('/')
-                # folder_name = folder[0][index + 1:]
-                # print(folder_name, 'removed')
-                print(folder[0], 'removed')
-                Path(folder[0]).rmdir()
+                # create new directory for this folder, named after its original directory
+                new_dir = cleaned_dir / Path(folder[0]).parent.name
+                print(folder[0], "moved to", cleaned_dir)
+                shutil.move(folder[0], str(cleaned_dir))
+    if os.listdir(cleaned_dir):
+        # move the cleaned dir to the Trash
+        send2trash(str(cleaned_dir))
 
 print("==options==")
 print("path:", dir_path)
