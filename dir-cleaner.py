@@ -55,8 +55,8 @@ parser.add_argument(
     "-p",
     "--path",
     help=f"Path to directory for cleaning. Default is {os.environ.get('MUSIC_PATH')}.",
-    # default="MUSIC_PATH",
-    default="TEST_PATH",
+    default="MUSIC_PATH",
+    # default="TEST_PATH",
 )
 
 parser.add_argument(
@@ -101,26 +101,28 @@ def dir_cleaner(dir, empty):
         prev_name = None
         for i, name in enumerate(dirs):
             if prev_name is not None:
-                print(prev_name)
-                print(name, '\n')
                 dir_path = os.path.join(root, name)
                 prev_dir_path = os.path.join(root, prev_name)
-                dir_files = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
-                prev_dir_files = [f for f in os.listdir(prev_dir_path) if os.path.isfile(os.path.join(prev_dir_path, f))]
-                if prev_name.lower() == name.lower() or name.lower().startswith(prev_name.lower()) or prev_name.lower().startswith(name.lower()):
-                    # check if number of files is the same and there are no subdirectories
-                    if len(dir_files) == len(prev_dir_files) and not any(os.path.isdir(os.path.join(dir_path, f)) for f in os.listdir(dir_path)):
-                        # if both names are dupes but the years are the same
-                        # ! think I have to check that the years are not equal still
-                        if keep.match(prev_name) and keep.match(name):
-                            print("==would leave this alone 0:", prev_name, name)
-                            print(f"Error: Both '{prev_name}' and '{name}' are duplicates but the years are different")
-                        elif keep.match(prev_name):
-                            print("==would move this dupe 1:", os.path.join(root, name), "vs this:", os.path.join(root, prev_name))
-                            # shutil.move(os.path.join(root, name), dupe_dirs)
-                        elif keep.match(name):
-                            print("==would move this dupe 2:", os.path.join(root, prev_name), "vs this:", os.path.join(root, name))
-                            # shutil.move(os.path.join(root, prev_name), dupe_dirs)
+                try:
+                    dir_files = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
+                    prev_dir_files = [f for f in os.listdir(prev_dir_path) if os.path.isfile(os.path.join(prev_dir_path, f))]
+                    if prev_name.lower() == name.lower() or name.lower().startswith(prev_name.lower()) or prev_name.lower().startswith(name.lower()):
+                        # check if number of files is the same and there are no subdirectories
+                        if len(dir_files) == len(prev_dir_files) and not any(os.path.isdir(os.path.join(dir_path, f)) for f in os.listdir(dir_path)):
+                            # if both names are dupes but the years are the same
+                            # ! think I have to check that the years are not equal still
+                            if keep.match(prev_name) and keep.match(name):
+                                # print("==same but different casing, would move this:", name)
+                                shutil.move(os.path.join(root, name), dupe_dirs)
+                            elif keep.match(prev_name):
+                                # print("==would move this dupe 1:", os.path.join(root, name), "vs this:", os.path.join(root, prev_name))
+                                shutil.move(os.path.join(root, name), dupe_dirs)
+                            elif keep.match(name):
+                                # print("==would move this dupe 2:", os.path.join(root, prev_name), "vs this:", os.path.join(root, name))
+                                shutil.move(os.path.join(root, prev_name), dupe_dirs)
+                except FileNotFoundError:
+                    # gracefully handle edge cases where files are not found
+                    continue
             prev_name = name
 
 	# walk files and remove files with an extension in patterns list
