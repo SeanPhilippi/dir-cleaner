@@ -142,8 +142,16 @@ def dir_cleaner(dir, empty):
                 print(folder[0], "moved to", cleaned_dir)
                 shutil.move(folder[0], str(cleaned_dir))
     if os.listdir(cleaned_dir):
-        # move the cleaned dir to the Trash
-        send2trash(str(cleaned_dir))
+        # if cleaned_dir isn't empty but it only has duplicate-dirs folder and that folder is empty
+        if len(os.listdir(cleaned_dir)) == 1 and 'duplicate-dirs' in os.listdir(cleaned_dir) and not os.listdir(dupe_dirs):
+            dupe_dirs.rmdir()
+            cleaned_dir.rmdir()
+        else:
+            # move the cleaned dir to the Trash
+            send2trash(str(cleaned_dir))
+    # if cleaned_dir is empty, delete it
+    else:
+        cleaned_dir.rmdir()
 
 print("==options==")
 print("path:", dir_path)
