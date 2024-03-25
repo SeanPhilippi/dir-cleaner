@@ -90,8 +90,19 @@ def dir_cleaner(dir, empty):
     else:
         patterns = default_patterns
 
+	# walk files and remove files with an extension in patterns list
+    for ext in tqdm(patterns):
+        files = dir.walkfiles(ext)
+        for file in files:
+            # create a new directory for this file, named after its original directory
+            new_dir = cleaned_dir / file.parent.name
+            new_dir.mkdir()
+            print(file, "moved to", new_dir)
+            shutil.move(str(file), str(new_dir))
+
     # regular expression pattern for folder names to keep
     keep = re.compile(r".*\(\d{4}\)$")
+    dirs_to_move = []
 
     # walk through the directories and remove any that are duplicates
     for root, dirs, files in os.walk(dir):
@@ -103,37 +114,29 @@ def dir_cleaner(dir, empty):
             if prev_name is not None:
                 dir_path = os.path.join(root, name)
                 prev_dir_path = os.path.join(root, prev_name)
-                try:
-                    dir_files = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
-                    prev_dir_files = [f for f in os.listdir(prev_dir_path) if os.path.isfile(os.path.join(prev_dir_path, f))]
-                    if prev_name.lower() == name.lower() or name.lower().startswith(prev_name.lower()) or prev_name.lower().startswith(name.lower()):
-                        # check if number of files is the same and there are no subdirectories
-                        if len(dir_files) == len(prev_dir_files) and not any(os.path.isdir(os.path.join(dir_path, f)) for f in os.listdir(dir_path)):
-                            # if both names are dupes but the years are the same
-                            # ! think I have to check that the years are not equal still
-                            if keep.match(prev_name) and keep.match(name):
-                                # print("==same but different casing, would move this:", name)
-                                shutil.move(os.path.join(root, name), dupe_dirs)
-                            elif keep.match(prev_name):
-                                # print("==would move this dupe 1:", os.path.join(root, name), "vs this:", os.path.join(root, prev_name))
-                                shutil.move(os.path.join(root, name), dupe_dirs)
-                            elif keep.match(name):
-                                # print("==would move this dupe 2:", os.path.join(root, prev_name), "vs this:", os.path.join(root, name))
-                                shutil.move(os.path.join(root, prev_name), dupe_dirs)
-                except FileNotFoundError:
-                    # gracefully handle edge cases where files are not found
-                    continue
+                dir_files = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
+                prev_dir_files = [f for f in os.listdir(prev_dir_path) if os.path.isfile(os.path.join(prev_dir_path, f))]
+                if prev_name.lower() == name.lower() or name.lower().startswith(prev_name.lower()) or prev_name.lower().startswith(name.lower()):
+                    # check if number of files is the same and there are no subdirectories
+                    if len(dir_files) == len(prev_dir_files) and not any(os.path.isdir(os.path.join(dir_path, f)) for f in os.listdir(dir_path)):
+                        # if both names are dupes but the years are the same
+                        # ! think I have to check that the years are not equal still
+                        if keep.match(prev_name) and keep.match(name):
+                            # print("==same but different casing, would move this:", name)
+                            dirs_to_move.append(os.path.join(root, name))
+                        elif keep.match(prev_name):
+                            # print("==would move this dupe 1:", name, "vs this:", prev_name)
+                            dirs_to_move.append(os.path.join(root, name))
+                        elif keep.match(name):
+                            # print("==would move this dupe 2:", prev_name, "vs this:", name)
+                            dirs_to_move.append(os.path.join(root, prev_name))
+                        else:
+                            print("==would move this dupe but matches none of the cases:", prev_name, "vs this:", name)
             prev_name = name
-
-	# walk files and remove files with an extension in patterns list
-    for ext in tqdm(patterns):
-        files = dir.walkfiles(ext)
-        for file in files:
-            # create a new directory for this file, named after its original directory
-            new_dir = cleaned_dir / file.parent.name
-            new_dir.mkdir()
-            print(file, "moved to", new_dir)
-            shutil.move(str(file), str(new_dir))
+    # move the duplicate directories to the duplicate-dirs folder
+    for dir_path in dirs_to_move:
+        # print('==moving:', dir_path)
+        shutil.move(dir_path, dupe_dirs)
 	# walk folders and delete any that are empty
     if empty == "t":
         folders = list(os.walk(dir))[1:]
