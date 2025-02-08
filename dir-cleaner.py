@@ -76,14 +76,17 @@ except:
 empty = args.empty
 
 def dir_cleaner(dir, empty):
+    print(os.getcwd())
     # create a directory for the cleaned files w current date
     now = datetime.now()
     cleaned_dir = Path(f"cleaned-{now.year}-{now.month}-{now.day}")
-    cleaned_dir.mkdir()
+    if not cleaned_dir.exists():
+        cleaned_dir.mkdir()
 
-    # create a directory for duplicate dirs
+    # create a directory for duplicate dirs in the cleaned_dir folder
     dupe_dirs = cleaned_dir / "duplicate-dirs"
-    dupe_dirs.mkdir()
+    if not dupe_dirs.exists():
+        dupe_dirs.mkdir()
 
     if dir == "TRANSMISSION_DWLDS_PATH":
         patterns = transmission_dwlds_patterns
@@ -96,9 +99,18 @@ def dir_cleaner(dir, empty):
         for file in files:
             # create a new directory for this file, named after its original directory
             new_dir = cleaned_dir / file.parent.name
-            new_dir.mkdir()
-            print(file, "moved to", new_dir)
-            shutil.move(str(file), str(new_dir))
+            if not new_dir.exists():
+                try:
+                    new_dir.mkdir()
+                except OSError as e:
+                    print(f"Error creating {new_dir}: {e}")
+                    continue
+
+            try:
+                shutil.move(file, new_dir / file.name)
+                print(file, "moved to", new_dir)
+            except OSError as e:
+                print(f"Error moving {file} to {new_dir}: {e}")
 
     # regular expression pattern for folder names to keep
     keep = re.compile(r".*\(\d{4}\)$")
@@ -141,14 +153,18 @@ def dir_cleaner(dir, empty):
     if empty == "t":
         folders = list(os.walk(dir))[1:]
         for folder in folders:
+            # if list of subdirs and list of files are both empty
             if not folder[1] and not folder[2]:
                 # create new directory for this folder, named after its original directory
                 new_dir = cleaned_dir / Path(folder[0]).parent.name
                 print(folder[0], "moved to", cleaned_dir)
                 shutil.move(folder[0], str(cleaned_dir))
-    if os.listdir(cleaned_dir):
+    cleaned_dir_contents = os.listdir(cleaned_dir)
+    if cleaned_dir_contents:
         # if cleaned_dir isn't empty but it only has duplicate-dirs folder and that folder is empty
-        if len(os.listdir(cleaned_dir)) == 1 and 'duplicate-dirs' in os.listdir(cleaned_dir) and not os.listdir(dupe_dirs):
+        print(f'==cleaned_dir {cleaned_dir}')
+        print(f'list of cleaned_dir: {cleaned_dir_contents}')
+        if len(cleaned_dir_contents) == 1 and 'duplicate-dirs' in cleaned_dir_contents and not os.listdir(dupe_dirs):
             dupe_dirs.rmdir()
             cleaned_dir.rmdir()
         else:
