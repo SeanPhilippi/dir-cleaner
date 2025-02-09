@@ -132,7 +132,6 @@ def dir_cleaner(dir, empty):
                     # check if number of files is the same and there are no subdirectories
                     if len(dir_files) == len(prev_dir_files) and not any(os.path.isdir(os.path.join(dir_path, f)) for f in os.listdir(dir_path)):
                         # if both names are dupes but the years are the same
-                        # ! think I have to check that the years are not equal still
                         if keep.match(prev_name) and keep.match(name):
                             # print("==same but different casing, would move this:", name)
                             dirs_to_move.append(os.path.join(root, name))
@@ -147,7 +146,7 @@ def dir_cleaner(dir, empty):
             prev_name = name
     # move the duplicate directories to the duplicate-dirs folder
     for dir_path in dirs_to_move:
-        # print('==moving:', dir_path)
+        # print('==moving to dupes folder:', dir_path)
         shutil.move(dir_path, dupe_dirs)
 	# walk folders and delete any that are empty
     if empty == "t":
