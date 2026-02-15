@@ -28,9 +28,11 @@ default_patterns = [
     "*.htm",
     "*.html",
     "*.ini",
+    "*.m3u",
     ".DS_Store",
     "Thumb.db",
     "*.url",
+    "*.zip",
 ]
 
 transmission_dwlds_patterns = [
@@ -55,7 +57,8 @@ parser.add_argument(
     "-p",
     "--path",
     help=f"Path to directory for cleaning. Default is {os.environ.get('MUSIC_PATH')}.",
-    default="MUSIC_PATH",
+    default="SLSK_DOWNLOADS",
+    # default="MUSIC_PATH",
     # default="TEST_PATH",
 )
 
@@ -94,7 +97,7 @@ def dir_cleaner(dir, empty):
         patterns = default_patterns
 
 	# walk files and remove files with an extension in patterns list
-    for ext in tqdm(patterns):
+    for ext in patterns:
         files = dir.walkfiles(ext)
         for file in files:
             # create a new directory for this file, named after its original directory
@@ -116,8 +119,12 @@ def dir_cleaner(dir, empty):
     keep = re.compile(r".*\(\d{4}\)$")
     dirs_to_move = []
 
+    # count total folders to process (exclude the root directory itself)
+    folders = [folder for folder in os.walk(dir)][1:]
+    total_folders = len(folders)
+
     # walk through the directories and remove any that are duplicates
-    for root, dirs, files in os.walk(dir):
+    for root, dirs, files in tqdm(os.walk(dir), total=total_folders, desc="Processing folders"):
         # if the folder name doesn't match the pattern, check for a duplicate
         # sort the directories in alpha order
         dirs.sort()
@@ -152,12 +159,17 @@ def dir_cleaner(dir, empty):
     if empty == "t":
         folders = list(os.walk(dir))[1:]
         for folder in folders:
-            # if list of subdirs and list of files are both empty
             if not folder[1] and not folder[2]:
-                # create new directory for this folder, named after its original directory
-                new_dir = cleaned_dir / Path(folder[0]).parent.name
-                print(folder[0], "moved to", cleaned_dir)
-                shutil.move(folder[0], str(cleaned_dir))
+                folder_path = Path(folder[0])
+                dest_name = f"{folder_path.parent.name}__{folder_path.name}"
+                dest = cleaned_dir / dest_name
+                try:
+                    print(folder[0], "moved to", dest)
+                    shutil.move(folder[0], str(dest))
+                except Exception as e:
+                    print(f"Error moving {folder[0]}: {e}, skipping.")
+                    continue
+
     cleaned_dir_contents = os.listdir(cleaned_dir)
     if cleaned_dir_contents:
         # if cleaned_dir isn't empty but it only has duplicate-dirs folder and that folder is empty
